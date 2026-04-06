@@ -8,10 +8,14 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class UserClient {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
     @Value("${external.mock-api.base-url}")
     private String baseUrl;
+
+    public UserClient(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     public User fetchUserById(int id) {
         String url = baseUrl + "/" + id;
