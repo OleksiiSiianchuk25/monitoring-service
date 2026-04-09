@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Monitoring Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light p-5">
+
+<div class="container bg-white p-4 rounded shadow-sm">
+    <h2 class="mb-4 text-primary">📊 Dashboard: Saved data</h2>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex gap-3">
+            <form th:action="@{/fetch}" method="post">
+                <button type="submit" class="btn btn-success">➕ Fetch data</button>
+            </form>
+            <a th:href="@{/}" class="btn btn-outline-secondary">🔄 Update table</a>
+        </div>
+
+        <div class="badge bg-info text-dark fs-6">
+            Total records in DB: <span th:text="${totalItems}">0</span>
+        </div>
+    </div>
+
+    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+
+    <table class="table table-hover table-bordered border-primary mt-3">
+        <thead class="table-primary">
+        <tr>
+            <th>External ID</th>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Email</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${users}">
+            <td th:text="${user.internalId}"></td>
+            <td th:text="${user.name}"></td>
+            <td th:text="${user.username}"></td>
+            <td th:text="${user.email}"></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(users)}">
+            <td colspan="4" class="text-center text-muted">No data available yet. Click the "Fetch data" button or wait a moment.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <nav th:if="${totalPages > 1}" class="mt-4">
+        <ul class="pagination justify-content-center">
+
+            <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                <a class="page-link" th:href="@{/(page=${currentPage - 1})}">Previous</a>
+            </li>
+
+            <li class="page-item"
+                th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                th:classappend="${currentPage == i ? 'active' : ''}">
+                <a class="page-link" th:href="@{/(page=${i})}" th:text="${i + 1}">1</a>
+            </li>
+
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                <a class="page-link" th:href="@{/(page=${currentPage + 1})}">Next</a>
+            </li>
+
+        </ul>
+    </nav>
+
+</div>
+
+</body>
+</html>
