@@ -14,11 +14,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DataFetchJob {
 
-    @Autowired
-    private UserClient userClient;
-
-    @Autowired
-    private UserProcessingService processingService;
+    private final UserClient userClient;
+    private final UserProcessingService processingService;
 
     @Scheduled(fixedRate = 10000)
     public void execute() {
