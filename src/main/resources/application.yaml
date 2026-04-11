@@ -7,3 +7,16 @@ spring:
 external:
   mock-api:
     base-url: https://jsonplaceholder.typicode.com/users
+
+management:
+  endpoints:
+    web:
+      exposure:
+#        include: "health,info,env,prometheus"
+        include: "health, prometheus"
+  endpoint:
+    health:
+      show-details: "always"
+  metrics:
+    tags:
+      application: ${spring.application.name}
