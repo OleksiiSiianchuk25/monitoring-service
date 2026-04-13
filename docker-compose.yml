@@ -1,4 +1,24 @@
 services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  app:
+    build: .
+    image: monitoring-service:v1.0
+    container_name: monitoring-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/monitoring_db
+
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -18,4 +38,5 @@ services:
       - grafana_data:/var/lib/grafana
 
 volumes:
+  mongo_data:
   grafana_data:
