@@ -22,6 +22,9 @@ public class DataFetchJob {
     public void execute() {
         try {
             int randomId = (int) (Math.random() * 10) + 1;
+
+            log.info("Requesting data from mock service for user ID: {}", randomId);
+
             User user = userClient.fetchUserById(randomId);
             processingService.processAndSave(user);
 
