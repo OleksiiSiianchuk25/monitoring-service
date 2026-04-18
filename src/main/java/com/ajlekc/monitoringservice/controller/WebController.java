@@ -1,8 +1,10 @@
 package com.ajlekc.monitoringservice.controller;
 
+import com.ajlekc.monitoringservice.dto.PaginationWindow;
 import com.ajlekc.monitoringservice.job.DataFetchJob;
 import com.ajlekc.monitoringservice.model.User;
 import com.ajlekc.monitoringservice.repository.UserRepository;
+import com.ajlekc.monitoringservice.service.PaginationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +23,7 @@ public class WebController {
 
     private final UserRepository userRepository;
     private final DataFetchJob dataFetchJob;
+    private final PaginationService paginationService; // Додали новий сервіс
 
     @GetMapping
     public String showDashboard(
@@ -30,10 +33,14 @@ public class WebController {
 
         Page<User> userPage = userRepository.findAll(PageRequest.of(page, size));
 
+        PaginationWindow window = paginationService.calculateWindow(page, userPage.getTotalPages());
+
         model.addAttribute("users", userPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", userPage.getTotalPages());
         model.addAttribute("totalItems", userPage.getTotalElements());
+        model.addAttribute("startPage", window.startPage());
+        model.addAttribute("endPage", window.endPage());
 
         return "main";
     }
