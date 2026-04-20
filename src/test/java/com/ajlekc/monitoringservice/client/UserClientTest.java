@@ -3,46 +3,78 @@ package com.ajlekc.monitoringservice.client;
 import com.ajlekc.monitoringservice.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(properties = "external.mock-api.base-url=http://test-server.com/users")
 class UserClientTest {
 
-    @Mock
-    private RestTemplate restTemplate;
-
-    @InjectMocks
+    @Autowired
     private UserClient userClient;
 
-    private final String baseUrl = "https://mock-api.com/users";
+    @Autowired
+    private RestTemplate restTemplate;
+
+    private MockRestServiceServer mockServer;
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(userClient, "baseUrl", baseUrl);
+        mockServer = MockRestServiceServer.createServer(restTemplate);
     }
 
     @Test
-    void testFetchUserByIdShouldReturnUser() {
+    void shouldFetchAndDeserializeUserSuccessfully() {
         int userId = 1;
-        String expectedUrl = baseUrl + "/" + userId;
-        User expectedUser = new User();
-        expectedUser.setExternalId(userId);
+        String expectedUrl = "http://test-server.com/users/1";
 
-        when(restTemplate.getForObject(expectedUrl, User.class)).thenReturn(expectedUser);
+        String jsonResponse = """
+                {
+                    "id": 1,
+                    "name": "Leanne Graham",
+                    "username": "Bret",
+                    "email": "Sincere@april.biz"
+                }
+                """;
 
-        User actualUser = userClient.fetchUserById(userId);
+        this.mockServer
+                .expect(requestTo(expectedUrl))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withSuccess(jsonResponse, MediaType.APPLICATION_JSON));
 
-        assertNotNull(actualUser);
-        assertEquals(userId, actualUser.getExternalId());
-        verify(restTemplate, times(1)).getForObject(expectedUrl, User.class);
+        User user = userClient.fetchUserById(userId);
+
+        assertNotNull(user, "User should not be null");
+        assertEquals("Leanne Graham", user.getName());
+        assertEquals("Bret", user.getUsername());
+        assertEquals("Sincere@april.biz", user.getEmail());
+
+        this.mockServer.verify();
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUserNotFound() {
+        int userId = 999;
+        String expectedUrl = "http://test-server.com/users/999";
+
+        this.mockServer
+                .expect(requestTo(expectedUrl))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.NOT_FOUND));
+
+        assertThrows(HttpClientErrorException.NotFound.class, () -> userClient.fetchUserById(userId));
+
+        this.mockServer.verify();
     }
 }
