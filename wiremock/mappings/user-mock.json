@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/mock-users/.*"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": 999,
+      "name": "Mocked User",
+      "username": "mock_hero",
+      "email": "mock.check@mockserver.com"
+    }
+  }
+}

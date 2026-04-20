@@ -7,6 +7,14 @@ services:
     volumes:
       - mongo_data:/data/db
 
+  mock-server:
+    image: wiremock/wiremock:latest
+    container_name: wiremock
+    ports:
+      - "8089:8080"
+    volumes:
+      - ./wiremock/mappings:/home/wiremock/mappings
+
   app:
     build: .
     image: monitoring-service:v1.0
@@ -15,9 +23,11 @@ services:
       - "8080:8080"
     depends_on:
       - mongodb
+      - mock-server
     environment:
       - SERVER_PORT=8080
-      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/monitoring_db
+      - SPRING_MONGODB_URI=mongodb://mongodb:27017/monitoring_db
+      - EXTERNAL_MOCK_API_BASE_URL=http://mock-server:8080/mock-users
 
   prometheus:
     image: prom/prometheus:latest
@@ -25,7 +35,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
 
   grafana:
     image: grafana/grafana:latest
