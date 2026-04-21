@@ -1,5 +1,6 @@
 # 📊 Monitoring Service
 [![Java CI/CD with Maven and Docker](https://github.com/OleksiiSiianchuk25/monitoring-service/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/OleksiiSiianchuk25/monitoring-service/actions/workflows/main.yml)
+
 That Spring Boot microservice app designed to fetch, process, and monitor user data. The project features are complete containerized infrastructure, including database persistence, external API mocking, and real-time observability.
 
 ## 🛠️ Tech Stack
