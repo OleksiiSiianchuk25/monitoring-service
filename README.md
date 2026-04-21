@@ -32,22 +32,41 @@ Before you begin, ensure you have the following installed:
 ### Option 1: Full Infrastructure (Recommended)
 This is the easiest way to start the application along with all its dependencies (Database, Mock Server, Monitoring tools).
 
-1. Clone the repository:
-   git clone https://github.com/OleksiiSiianchuk25/monitoring-service.git
+1. **Clone the repository:**
+ 
+   * git clone https://github.com/OleksiiSiianchuk25/monitoring-service.git
    
-   cd monitoring-service
+   * cd monitoring-service
+  
+2. **Start all services using Docker Compose:**
+
+   docker-compose up -d --build
+
+3. **To stop the application:**
+
+   docker-compose down
 
 ### Option 2: Local Development Mode
 
 If you want to run the Spring Boot application locally via your IDE but still need the database and mock server:
 
-1. Start only the backing services:
+1. **Start only the backing services:**
    docker-compose up -d mongodb mock-server prometheus grafana
 
-2. Run the application
+2. **Run the application**
 
 You can still run the application without using Docker. 
 The only difference is that there will be a local MongoDB database, and you will receive data from an external mock API service (https://jsonplaceholder.typicode.com/users/{id}).
+
+## 🌐 Useful Endpoints
+Once the application is running, you can access the following services:
+| Service | URL | Description |
+| :--- | :--- | :--- |
+| **Web UI** | `http://localhost:8080/` | Main dashboard with paginated user data. |
+| **Actuator** | `http://localhost:8080/actuator/health` | Application health status. |
+| **Prometheus** | `http://localhost:9090/` | Metrics collection server. |
+| **Grafana** | `http://localhost:3000/` | Visualization dashboards (default login: `admin` / `admin`). |
+| **WireMock** | `http://localhost:8089/__admin` | Mock server mappings admin page. |
 
 ## 🔄 CI/CD Pipeline
 This project is configured with GitHub Actions. On every push or pull request to the master branch:
