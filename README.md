@@ -48,7 +48,7 @@ If you want to run the Spring Boot application locally via your IDE but still ne
 You can still run the application without using Docker. 
 The only difference is that there will be a local MongoDB database, and you will receive data from an external mock API service (https://jsonplaceholder.typicode.com/users/{id}).
 
-🔄 CI/CD Pipeline
+## 🔄 CI/CD Pipeline
 This project is configured with GitHub Actions. On every push or pull request to the master branch:
   1. A temporary MongoDB container is spun up.
   2. Maven builds the project and runs all Unit and Integration tests.
