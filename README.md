@@ -34,6 +34,7 @@ This is the easiest way to start the application along with all its dependencies
 
 1. Clone the repository:
    git clone https://github.com/OleksiiSiianchuk25/monitoring-service.git
+   
    cd monitoring-service
 
 ### Option 2: Local Development Mode
