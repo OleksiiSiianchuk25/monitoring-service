@@ -23,7 +23,7 @@ public class WebController {
 
     private final UserRepository userRepository;
     private final DataFetchJob dataFetchJob;
-    private final PaginationService paginationService; // Додали новий сервіс
+    private final PaginationService paginationService;
 
     @GetMapping
     public String showDashboard(
