@@ -67,6 +67,16 @@ You can still run the application without using Docker.
 The only difference is that there will be a local MongoDB database, and you will receive data from an external mock API
 service (https://jsonplaceholder.typicode.com/users/{id}).
 
+### Grafana Dashboard
+
+You can create your own dashboard to view specific application metrics, or import a pre-made dashboard. 
+You can find the JSON file at the following path. This is the dashboard configuration for Grafana.
+
+To access Grafana: http://localhost:3000/
+
+Before that, to receive these metrics in Grafana, you need to configure the Data Source. 
+Go to Connections -> Data sources -> Add new data source (top right corner) -> Select Prometheus 
+-> Enter http://prometheus:9090 in the Connection field -> Save & test
 
 ## Useful Endpoints
 
