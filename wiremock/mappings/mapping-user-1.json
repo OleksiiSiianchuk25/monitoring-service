@@ -1,0 +1,35 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/mock-users/1"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": 1,
+      "name": "Vespera Sardonyx",
+      "username": "draconic_fire",
+      "email": "vespera@faerun.com",
+      "address": {
+        "street": "Sword Coast Avenue",
+        "suite": "Apt. 5e",
+        "city": "Neverwinter",
+        "zipcode": "10001-1234",
+        "geo": {
+          "lat": "-37.3159",
+          "lng": "81.1496"
+        }
+      },
+      "phone": "+1-555-019-2834",
+      "website": "tiefling-magic.net",
+      "company": {
+        "name": "Sorcery Bloodline Ltd.",
+        "catchPhrase": "Tactical combat and spells",
+        "bs": "fireball optimization"
+      }
+    }
+  }
+}

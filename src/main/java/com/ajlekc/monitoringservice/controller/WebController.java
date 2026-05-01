@@ -2,8 +2,11 @@ package com.ajlekc.monitoringservice.controller;
 
 import com.ajlekc.monitoringservice.dto.PaginationWindow;
 import com.ajlekc.monitoringservice.job.DataFetchJob;
+import com.ajlekc.monitoringservice.model.JobRun;
 import com.ajlekc.monitoringservice.model.User;
+import com.ajlekc.monitoringservice.repository.JobRunRepository;
 import com.ajlekc.monitoringservice.repository.UserRepository;
+import com.ajlekc.monitoringservice.service.JobAuditService;
 import com.ajlekc.monitoringservice.service.PaginationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,6 +25,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class WebController {
 
     private final UserRepository userRepository;
+    private final JobRunRepository jobRunRepository;
     private final DataFetchJob dataFetchJob;
     private final PaginationService paginationService;
 
@@ -32,8 +36,10 @@ public class WebController {
             Model model) {
 
         Page<User> userPage = userRepository.findAll(PageRequest.of(page, size));
-
         PaginationWindow window = paginationService.calculateWindow(page, userPage.getTotalPages());
+
+        Page<JobRun> recentRuns = jobRunRepository
+                .findAllByOrderByStartedAtDesc(PageRequest.of(0, 10));
 
         model.addAttribute("users", userPage.getContent());
         model.addAttribute("currentPage", page);
@@ -41,6 +47,7 @@ public class WebController {
         model.addAttribute("totalItems", userPage.getTotalElements());
         model.addAttribute("startPage", window.startPage());
         model.addAttribute("endPage", window.endPage());
+        model.addAttribute("recentRuns", recentRuns.getContent());
 
         return "main";
     }

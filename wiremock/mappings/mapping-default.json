@@ -1,0 +1,33 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/mock-users/[3-9]|/mock-users/10"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": "{{request.path.[1]}}",
+      "name": "Standard User {{request.path.[1]}}",
+      "username": "user_{{request.path.[1]}}",
+      "email": "user{{request.path.[1]}}@example.com",
+      "address": {
+        "street": "Main Street",
+        "suite": "Suite {{request.path.[1]}}",
+        "city": "Metropolis",
+        "zipcode": "00000",
+        "geo": { "lat": "0.0", "lng": "0.0" }
+      },
+      "phone": "000-000-0000",
+      "website": "example.com",
+      "company": {
+        "name": "Generic Corp",
+        "catchPhrase": "Doing business",
+        "bs": "synergy"
+      }
+    },
+    "transformers": ["response-template"]
+  }
+}

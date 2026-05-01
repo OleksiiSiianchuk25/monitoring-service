@@ -1,0 +1,35 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/mock-users/2"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": 2,
+      "name": "Cloud Engineer",
+      "username": "spark_master",
+      "email": "bigdata@cloud.com",
+      "address": {
+        "street": "Fabryczna City",
+        "suite": "Block A",
+        "city": "Krakow",
+        "zipcode": "31-553",
+        "geo": {
+          "lat": "50.0647",
+          "lng": "19.9450"
+        }
+      },
+      "phone": "+48-555-888-999",
+      "website": "data-factory-pipelines.com",
+      "company": {
+        "name": "Azure Analytics Inc.",
+        "catchPhrase": "Eliminating shuffle bottlenecks",
+        "bs": "distributed cluster computing"
+      }
+    }
+  }
+}

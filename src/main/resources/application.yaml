@@ -3,11 +3,11 @@ spring:
     name: monitoring-service
   mongodb:
 #    uri: mongodb://mongodb:27017/monitoring_db
-    uri: mongodb://localhost:27017/testLocal
+    uri: mongodb://localhost:27017/monitoring_db
 
 external:
   mock-api:
-    base-url: https://jsonplaceholder.typicode.com/users
+    base-url: http://localhost:8089/mock-users
 
 management:
   endpoints:
