@@ -3,13 +3,14 @@ services:
     image: mongo:latest
     container_name: mongodb
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
       - mongo_data:/data/db
 
   mock-server:
     image: wiremock/wiremock:latest
     container_name: wiremock
+    command: ["--global-response-templating"]
     ports:
       - "8089:8080"
     volumes:

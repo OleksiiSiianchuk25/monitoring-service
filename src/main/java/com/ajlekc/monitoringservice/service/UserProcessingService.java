@@ -1,10 +1,11 @@
 package com.ajlekc.monitoringservice.service;
 
+import com.ajlekc.monitoringservice.model.ChangeType;
 import com.ajlekc.monitoringservice.model.User;
 import com.ajlekc.monitoringservice.repository.UserRepository;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
-import jakarta.annotation.PostConstruct; // У Spring Boot 3 використовується jakarta, а не javax
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 public class UserProcessingService {
 
     private final UserRepository userRepository;
+    private final UserChangeDetector userChangeDetector;
     private final MeterRegistry meterRegistry;
 
     @PostConstruct
@@ -24,13 +26,31 @@ public class UserProcessingService {
                 .register(meterRegistry);
     }
 
-    public void processAndSave(User user) {
+    public ChangeType processAndSave(User user) {
         if (user == null) {
             log.warn("The empty user was found. Saving has been canceled.");
-            return;
+            return null;
         }
 
-        userRepository.save(user);
-        log.info("User {} (External ID: {}) successfully saved to the database", user.getName(), user.getExternalId());
+        ChangeType change = userChangeDetector.classifyFetchedUser(user);
+
+        switch (change) {
+            case NEW -> {
+                userRepository.save(user);
+                meterRegistry.counter("monitoring.records.changes", "type", "new").increment();
+                log.info("User {} (External ID: {}) saved as NEW", user.getName(), user.getExternalId());
+            }
+            case UPDATED -> {
+                userRepository.save(user);
+                meterRegistry.counter("monitoring.records.changes", "type", "updated").increment();
+                log.info("User {} (External ID: {}) saved as UPDATED", user.getName(), user.getExternalId());
+            }
+            case UNCHANGED -> {
+                meterRegistry.counter("monitoring.records.changes", "type", "unchanged").increment();
+                log.debug("User {} (External ID: {}) is UNCHANGED, skipping save", user.getName(), user.getExternalId());
+            }
+        }
+
+        return change;
     }
 }
