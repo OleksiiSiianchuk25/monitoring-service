@@ -19,6 +19,8 @@ public class UserProcessingService {
     private final UserChangeDetector userChangeDetector;
     private final MeterRegistry meterRegistry;
 
+    private final UserEventProducer eventProducer;
+
     @PostConstruct
     public void initMetrics() {
         Gauge.builder("monitoring.records.stored", userRepository, UserRepository::count)
@@ -39,11 +41,15 @@ public class UserProcessingService {
                 userRepository.save(user);
                 meterRegistry.counter("monitoring.records.changes", "type", "new").increment();
                 log.info("User {} (External ID: {}) saved as NEW", user.getName(), user.getExternalId());
+
+                eventProducer.publishUserChangedEvent(user, ChangeType.NEW);
             }
             case UPDATED -> {
                 userRepository.save(user);
                 meterRegistry.counter("monitoring.records.changes", "type", "updated").increment();
                 log.info("User {} (External ID: {}) saved as UPDATED", user.getName(), user.getExternalId());
+
+                eventProducer.publishUserChangedEvent(user, ChangeType.UPDATED);
             }
             case UNCHANGED -> {
                 meterRegistry.counter("monitoring.records.changes", "type", "unchanged").increment();

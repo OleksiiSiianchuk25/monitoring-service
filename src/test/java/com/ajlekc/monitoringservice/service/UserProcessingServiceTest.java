@@ -24,13 +24,17 @@ class UserProcessingServiceTest {
     @Mock
     private UserChangeDetector changeDetector;
 
+    @Mock
+    private UserEventProducer eventProducer;
+
     private UserProcessingService userProcessingService;
     private SimpleMeterRegistry meterRegistry;
 
     @BeforeEach
     void setUp() {
         meterRegistry = new SimpleMeterRegistry();
-        userProcessingService = new UserProcessingService(userRepository, changeDetector, meterRegistry);
+
+        userProcessingService = new UserProcessingService(userRepository, changeDetector, meterRegistry, eventProducer);
 
         userProcessingService.initMetrics();
     }
@@ -47,7 +51,10 @@ class UserProcessingServiceTest {
 
         assertThat(result).isEqualTo(ChangeType.NEW);
         verify(userRepository, times(1)).save(testUser);
-        assertThat(meterRegistry.counter("monitoring.records.changes", "type", "new").count()).isEqualTo(1.0);
+
+        verify(eventProducer, times(1)).publishUserChangedEvent(testUser, ChangeType.NEW);
+        assertThat(meterRegistry.counter("monitoring.records.changes", "type", "new")
+                .count()).isEqualTo(1.0);
     }
 
     @Test
@@ -61,7 +68,10 @@ class UserProcessingServiceTest {
 
         assertThat(result).isEqualTo(ChangeType.UPDATED);
         verify(userRepository, times(1)).save(testUser);
-        assertThat(meterRegistry.counter("monitoring.records.changes", "type", "updated").count()).isEqualTo(1.0);
+
+        verify(eventProducer, times(1)).publishUserChangedEvent(testUser, ChangeType.UPDATED);
+        assertThat(meterRegistry.counter("monitoring.records.changes", "type", "updated")
+                .count()).isEqualTo(1.0);
     }
 
     @Test
@@ -75,7 +85,10 @@ class UserProcessingServiceTest {
 
         assertThat(result).isEqualTo(ChangeType.UNCHANGED);
         verify(userRepository, never()).save(any());
-        assertThat(meterRegistry.counter("monitoring.records.changes", "type", "unchanged").count()).isEqualTo(1.0);
+
+        verify(eventProducer, never()).publishUserChangedEvent(any(), any());
+        assertThat(meterRegistry.counter("monitoring.records.changes", "type", "unchanged")
+                .count()).isEqualTo(1.0);
     }
 
     @Test
@@ -85,6 +98,7 @@ class UserProcessingServiceTest {
         assertNull(result);
         verify(userRepository, never()).save(any());
         verifyNoInteractions(changeDetector);
+        verifyNoInteractions(eventProducer);
     }
 
     @Test
