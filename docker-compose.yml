@@ -16,6 +16,45 @@ services:
     volumes:
       - ./wiremock/mappings:/home/wiremock/mappings
 
+  kafka:
+    image: confluentinc/cp-kafka:8.1.0
+    container_name: kafka
+    hostname: kafka
+    ports:
+      - "9092:29092"
+    environment:
+      CLUSTER_ID: HulUx3m9Tfi6PpKSB76v1A
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: INTERNAL://:9091,EXTERNAL://:29092,CONTROLLER://:9093
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9091,EXTERNAL://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9091", "--list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:v0.7.2
+    container_name: kafka-ui
+    hostname: kafka-ui
+    ports:
+      - "8090:8080"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      KAFKA_CLUSTERS_0_NAME: Local-KRaft-Cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9091
+      DYNAMIC_CONFIG_ENABLED: true
+
   app:
     build: .
     image: monitoring-service:v1.0
@@ -23,12 +62,17 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - mongodb
-      - mock-server
+      mongodb:
+        condition: service_started
+      mock-server:
+        condition: service_started
+      kafka:
+        condition: service_healthy
     environment:
       - SERVER_PORT=8080
       - SPRING_MONGODB_URI=mongodb://mongodb:27017/monitoring_db
       - EXTERNAL_MOCK_API_BASE_URL=http://mock-server:8080/mock-users
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9091
 
   prometheus:
     image: prom/prometheus:latest

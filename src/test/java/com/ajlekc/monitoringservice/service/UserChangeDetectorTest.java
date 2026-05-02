@@ -46,7 +46,7 @@ class UserChangeDetectorTest {
         incoming.setExternalId(1);
         incoming.setName("Test User");
 
-        when(userRepository.findByExternalId(1)).thenReturn(Optional.empty());
+        when(userRepository.findFirstByExternalIdOrderByInternalId(1)).thenReturn(Optional.empty());
 
         assertThat(detector.classifyFetchedUser(incoming)).isEqualTo(ChangeType.NEW);
     }
@@ -56,7 +56,7 @@ class UserChangeDetectorTest {
         User existing = sampleUser("internal-1");
         User incoming = sampleUser(null);
 
-        when(userRepository.findByExternalId(1)).thenReturn(Optional.of(existing));
+        when(userRepository.findFirstByExternalIdOrderByInternalId(1)).thenReturn(Optional.of(existing));
 
         ChangeType result = detector.classifyFetchedUser(incoming);
 
@@ -70,7 +70,7 @@ class UserChangeDetectorTest {
         User incoming = sampleUser(null);
         incoming.setName("New Name");
 
-        when(userRepository.findByExternalId(1)).thenReturn(Optional.of(existing));
+        when(userRepository.findFirstByExternalIdOrderByInternalId(1)).thenReturn(Optional.of(existing));
 
         ChangeType result = detector.classifyFetchedUser(incoming);
 
@@ -84,7 +84,7 @@ class UserChangeDetectorTest {
         User incoming = sampleUser(null);
         incoming.setEmail("changed@example.com");
 
-        when(userRepository.findByExternalId(1)).thenReturn(Optional.of(existing));
+        when(userRepository.findFirstByExternalIdOrderByInternalId(1)).thenReturn(Optional.of(existing));
 
         assertThat(detector.classifyFetchedUser(incoming)).isEqualTo(ChangeType.UPDATED);
     }

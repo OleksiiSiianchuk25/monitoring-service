@@ -22,7 +22,7 @@ public class UserChangeDetector {
             return ChangeType.NEW;
         }
 
-        Optional<User> existing = userRepository.findByExternalId(fetchedUser.getExternalId());
+        Optional<User> existing = userRepository.findFirstByExternalIdOrderByInternalId(fetchedUser.getExternalId());
         if (existing.isEmpty()) {
             log.debug("User {} is NEW", fetchedUser.getExternalId());
             return ChangeType.NEW;
