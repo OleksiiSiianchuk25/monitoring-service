@@ -14,6 +14,23 @@ jobs:
         image: mongo:latest
         ports:
           - 27017:27017
+
+      kafka:
+        image: confluentinc/cp-kafka:7.5.0
+        ports:
+          - 9092:9092
+        env:
+          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+          KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+          KAFKA_NODE_ID: 1
+          KAFKA_PROCESS_ROLES: broker,controller
+          KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+          KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+          KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+          CLUSTER_ID: mkU3OtkVSCWDv3pIsAeMog
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -28,6 +45,8 @@ jobs:
       - name: Build and Test with Maven
         env:
           SPRING_DATA_MONGODB_URI: mongodb://localhost:27017/test_db
+          SPRING_KAFKA_BOOTSTRAP_SERVERS: localhost:9092
+          APP_SCHEDULING_ENABLED: false
         run: mvn clean verify
 
       - name: Upload JAR Artifact
