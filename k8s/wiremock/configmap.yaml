@@ -1,0 +1,112 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wiremock-mappings
+  namespace: monitoring
+data:
+  mapping-user-1.json: |
+    {
+      "request": {
+        "method": "GET",
+        "urlPattern": "/mock-users/1"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "id": 1,
+          "name": "Vespera Sardonyx",
+          "username": "draconic_fire",
+          "email": "vespera@faerun.com",
+          "address": {
+            "street": "Sword Coast Avenue",
+            "suite": "Apt. 5e",
+            "city": "Neverwinter",
+            "zipcode": "10001-1234",
+            "geo": {
+              "lat": "-37.3159",
+              "lng": "81.1496"
+            }
+          },
+          "phone": "+1-555-019-2834",
+          "website": "tiefling-magic.net",
+          "company": {
+            "name": "Sorcery Bloodline Ltd.",
+            "catchPhrase": "Tactical combat and spells",
+            "bs": "fireball optimization"
+          }
+        }
+      }
+    }
+  mapping-user-2.json: |
+    {
+      "request": {
+        "method": "GET",
+        "urlPattern": "/mock-users/2"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "id": 2,
+          "name": "Cloud Engineer",
+          "username": "spark_master",
+          "email": "bigdata@cloud.com",
+          "address": {
+            "street": "Fabryczna City",
+            "suite": "Block A",
+            "city": "Krakow",
+            "zipcode": "31-553",
+            "geo": {
+              "lat": "50.0647",
+              "lng": "19.9450"
+            }
+          },
+          "phone": "+48-555-888-999",
+          "website": "data-factory-pipelines.com",
+          "company": {
+            "name": "Azure Analytics Inc.",
+            "catchPhrase": "Eliminating shuffle bottlenecks",
+            "bs": "distributed cluster computing"
+          }
+        }
+      }
+    }
+  mapping-default.json: |
+    {
+      "request": {
+        "method": "GET",
+        "urlPattern": "/mock-users/[3-9]|/mock-users/10"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "id": "{{request.path.[1]}}",
+          "name": "Standard User {{request.path.[1]}}",
+          "username": "user_{{request.path.[1]}}",
+          "email": "user{{request.path.[1]}}@example.com",
+          "address": {
+            "street": "Main Street",
+            "suite": "Suite {{request.path.[1]}}",
+            "city": "Metropolis",
+            "zipcode": "00000",
+            "geo": { "lat": "0.0", "lng": "0.0" }
+          },
+          "phone": "000-000-0000",
+          "website": "example.com",
+          "company": {
+            "name": "Generic Corp",
+            "catchPhrase": "Doing business",
+            "bs": "synergy"
+          }
+        },
+        "transformers": ["response-template"]
+      }
+    }
