@@ -1,5 +1,6 @@
 package com.ajlekc.monitoringservice.client;
 
+import com.ajlekc.monitoringservice.integration.TestcontainersConfig;
 import com.ajlekc.monitoringservice.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,8 +19,11 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-@SpringBootTest(properties = "external.mock-api.base-url=http://test-server.com/users")
-class UserClientTest {
+@SpringBootTest(properties = {
+        "external.mock-api.base-url=http://test-server.com/users",
+        "app.scheduling.enabled=false"
+})
+class UserClientTest extends TestcontainersConfig {
 
     @Autowired
     private UserClient userClient;

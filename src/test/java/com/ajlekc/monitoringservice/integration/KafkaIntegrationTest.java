@@ -5,6 +5,7 @@ import com.ajlekc.monitoringservice.model.ChangeType;
 import com.ajlekc.monitoringservice.model.User;
 import com.ajlekc.monitoringservice.service.UserEventProducer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -12,9 +13,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +25,6 @@ import static org.assertj.core.api.Assertions.assertThat;
         "app.scheduling.enabled=false",
         "external.mock-api.base-url=http://localhost:9999/mock-users"
 })
-@Testcontainers
 class KafkaIntegrationTest extends TestcontainersConfig {
 
     @Autowired
@@ -33,21 +33,30 @@ class KafkaIntegrationTest extends TestcontainersConfig {
     @Test
     void shouldPublishEventToKafkaTopic() {
         User user = new User();
-        user.setExternalId(1);
-        user.setName("Test User");
+        user.setExternalId(10101);
+        user.setName("Kafka Test User");
 
         eventProducer.publishUserChangedEvent(user, ChangeType.NEW);
 
         try (KafkaConsumer<String, UserEvent> consumer = createTestConsumer()) {
             consumer.subscribe(List.of("user-audit-events"));
 
-            ConsumerRecords<String, UserEvent> records = consumer.poll(Duration.ofSeconds(10));
+            List<UserEvent> relevantEvents = new ArrayList<>();
+            long endTime = System.currentTimeMillis() + 10000;
 
-            assertThat(records.count()).isEqualTo(1);
+            while (System.currentTimeMillis() < endTime && relevantEvents.isEmpty()) {
+                ConsumerRecords<String, UserEvent> records = consumer.poll(Duration.ofMillis(500));
+                for (ConsumerRecord<String, UserEvent> record : records) {
+                    if (record.value().externalId() == 10101) {
+                        relevantEvents.add(record.value());
+                    }
+                }
+            }
 
-            UserEvent event = records.iterator().next().value();
-            assertThat(event.externalId()).isEqualTo(1);
-            assertThat(event.name()).isEqualTo("Test User");
+            assertThat(relevantEvents).hasSize(1);
+
+            UserEvent event = relevantEvents.get(0);
+            assertThat(event.name()).isEqualTo("Kafka Test User");
             assertThat(event.changeType()).isEqualTo(ChangeType.NEW);
             assertThat(event.timestamp()).isNotNull();
         }
@@ -56,11 +65,11 @@ class KafkaIntegrationTest extends TestcontainersConfig {
     @Test
     void shouldPublishMultipleEventsWithCorrectKeys() {
         User user1 = new User();
-        user1.setExternalId(1);
+        user1.setExternalId(20201);
         user1.setName("User One");
 
         User user2 = new User();
-        user2.setExternalId(2);
+        user2.setExternalId(20202);
         user2.setName("User Two");
 
         eventProducer.publishUserChangedEvent(user1, ChangeType.NEW);
@@ -69,18 +78,29 @@ class KafkaIntegrationTest extends TestcontainersConfig {
         try (KafkaConsumer<String, UserEvent> consumer = createTestConsumer()) {
             consumer.subscribe(List.of("user-audit-events"));
 
-            ConsumerRecords<String, UserEvent> records = consumer.poll(Duration.ofSeconds(10));
+            List<ConsumerRecord<String, UserEvent>> relevantRecords = new ArrayList<>();
+            long endTime = System.currentTimeMillis() + 10000;
 
-            assertThat(records.count()).isEqualTo(2);
+            while (System.currentTimeMillis() < endTime && relevantRecords.size() < 2) {
+                ConsumerRecords<String, UserEvent> records = consumer.poll(Duration.ofMillis(500));
+                for (ConsumerRecord<String, UserEvent> record : records) {
+                    if (record.value().externalId() == 20201 || record.value().externalId() == 20202) {
+                        relevantRecords.add(record);
+                    }
+                }
+            }
 
-            var iterator = records.iterator();
-            var record1 = iterator.next();
-            var record2 = iterator.next();
+            relevantRecords.sort((r1, r2) -> Integer.compare(r1.value().externalId(), r2.value().externalId()));
 
-            assertThat(record1.key()).isEqualTo("1");
+            assertThat(relevantRecords).hasSize(2);
+
+            var record1 = relevantRecords.get(0);
+            var record2 = relevantRecords.get(1);
+
+            assertThat(record1.key()).isEqualTo("20201");
             assertThat(record1.value().changeType()).isEqualTo(ChangeType.NEW);
 
-            assertThat(record2.key()).isEqualTo("2");
+            assertThat(record2.key()).isEqualTo("20202");
             assertThat(record2.value().changeType()).isEqualTo(ChangeType.UPDATED);
         }
     }

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Optional;
@@ -23,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         "external.mock-api.base-url=http://localhost:9999/mock-users"
 })
 @Testcontainers
+@WithMockUser(username = "admin", roles = {"ADMIN"})
 class FullFlowIntegrationTest extends TestcontainersConfig {
 
     @Autowired

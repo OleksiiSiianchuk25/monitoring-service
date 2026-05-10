@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Monitoring Dashboard</title>
@@ -7,6 +7,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body class="bg-light p-5">
+
+<div sec:authorize="isAuthenticated()">
+    Вітаємо, <span sec:authentication="name"></span>!
+    <form th:action="@{/logout}" method="post" style="display:inline;">
+        <button type="submit">Вийти</button>
+    </form>
+</div>
 
 <div class="container bg-white p-4 rounded shadow-sm">
     <div class="d-flex justify-content-between align-items-center mb-4">
