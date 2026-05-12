@@ -16,6 +16,15 @@ spring:
       properties:
         spring.json.trusted.packages: "com.ajlekc.monitoringservice.event"
 
+app:
+  security:
+    admin:
+      username: admin
+      password: admin
+    user:
+      username: user
+      password: user
+
 external:
   mock-api:
     base-url: ${EXTERNAL_MOCK_API_BASE_URL:http://localhost:8089/mock-users}

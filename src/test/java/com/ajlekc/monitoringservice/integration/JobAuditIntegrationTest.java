@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
         "app.scheduling.enabled=false",
         "external.mock-api.base-url=http://localhost:9999/mock-users"
 })
-@Testcontainers
 class JobAuditIntegrationTest extends TestcontainersConfig {
 
     @Autowired

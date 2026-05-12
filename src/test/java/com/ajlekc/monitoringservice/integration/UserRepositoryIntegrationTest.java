@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Optional;
 
@@ -18,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
         "app.scheduling.enabled=false",
         "external.mock-api.base-url=http://localhost:9999/mock-users"
 })
-@Testcontainers
 class UserRepositoryIntegrationTest extends TestcontainersConfig {
 
     @Autowired

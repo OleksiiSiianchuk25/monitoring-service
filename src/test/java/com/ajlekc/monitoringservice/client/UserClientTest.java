@@ -23,7 +23,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
         "external.mock-api.base-url=http://test-server.com/users",
         "app.scheduling.enabled=false"
 })
-class UserClientTest extends TestcontainersConfig {
+class UserClientTest {
 
     @Autowired
     private UserClient userClient;

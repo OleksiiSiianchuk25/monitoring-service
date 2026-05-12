@@ -31,7 +31,7 @@ public class UserChangeDetector {
         User stored = existing.get();
         fetchedUser.setInternalId(stored.getInternalId());
 
-        if (areEquivalent(stored, fetchedUser)) {
+        if (stored.equals(fetchedUser)) {
             log.debug("User {} is UNCHANGED", fetchedUser.getExternalId());
             return ChangeType.UNCHANGED;
         }
@@ -40,14 +40,4 @@ public class UserChangeDetector {
         return ChangeType.UPDATED;
     }
 
-    // TODO: rewrite User hashcode and equals methods
-    private boolean areEquivalent(User a, User b) {
-        return Objects.equals(a.getName(), b.getName())
-                && Objects.equals(a.getUsername(), b.getUsername())
-                && Objects.equals(a.getEmail(), b.getEmail())
-                && Objects.equals(a.getPhone(), b.getPhone())
-                && Objects.equals(a.getWebsite(), b.getWebsite())
-                && Objects.equals(a.getAddress(), b.getAddress())
-                && Objects.equals(a.getCompany(), b.getCompany());
-    }
 }
