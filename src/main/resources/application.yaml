@@ -1,6 +1,13 @@
 spring:
   application:
     name: monitoring-service
+  security:
+    admin:
+      username: admin
+      password: admin
+    user:
+      username: user
+      password: user
   mongodb:
     uri: ${SPRING_MONGODB_URI:mongodb://localhost:27017/monitoring_db}
   kafka:
