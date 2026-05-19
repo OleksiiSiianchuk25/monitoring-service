@@ -61,16 +61,13 @@ class FullFlowIntegrationTest extends TestcontainersConfig {
     void shouldClassifyAsUnchangedWhenSameDataFetchedAgain() {
         User user = createTestUser(1, "Same User", "same@test.com");
 
-        // First save - NEW
         ChangeType firstResult = processingService.processAndSave(user);
         assertThat(firstResult).isEqualTo(ChangeType.NEW);
 
-        // Fetch the same data again - UNCHANGED
         User sameUser = createTestUser(1, "Same User", "same@test.com");
         ChangeType secondResult = processingService.processAndSave(sameUser);
         assertThat(secondResult).isEqualTo(ChangeType.UNCHANGED);
 
-        // Still only one record in DB
         assertThat(userRepository.count()).isEqualTo(1);
     }
 

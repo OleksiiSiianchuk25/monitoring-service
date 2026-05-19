@@ -75,7 +75,7 @@ class JobAuditIntegrationTest extends TestcontainersConfig {
         JobRun run1 = jobAuditService.start();
         jobAuditService.finishSuccess(run1, new JobAuditService.JobRunCounters());
 
-        Thread.sleep(10); // ensure different timestamps
+        Thread.sleep(10);
 
         JobRun run2 = jobAuditService.start();
         jobAuditService.finishFailure(run2, "error");
